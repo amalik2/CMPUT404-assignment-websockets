@@ -43,8 +43,8 @@
    - [ ] Implement the Websockets Javascript parts in the HTML file static/index.htm
    - [ ] Implement the Websockets send/recv part of the webservice
    - [ ] Upon update all the clients should recv a websocket update message
-   - [ ] Use JSON to communicate (no plain text!)
-   - [ ] The webservice can pass all the tests in freetests.py
+   - [X] Use JSON to communicate (no plain text!)
+   - [X] The webservice can pass all the tests in freetests.py
    - [ ] The webservice can pass all the tests in not-free-tests.py (you only have part of this one, I reserve the right to add tests)
    - [ ] The webservice can serve /static/index.html
    - [ ] static/index.html displays the current state of the webservice

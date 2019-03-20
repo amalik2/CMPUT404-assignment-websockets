@@ -59,3 +59,9 @@ Contributors
 * Mark Galloway
 * Abram Hindle
 * Cole Mackenzie
+
+External References
+===================
+
+# TODO: attribution details
+https://stackoverflow.com/a/47526225

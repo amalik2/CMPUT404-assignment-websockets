@@ -254,6 +254,7 @@ function wsSetup() {
     socket = new WebSocket(url);
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
+        socket.send("START TALKING");
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
@@ -261,6 +262,7 @@ function wsSetup() {
     socket.onmessage = function(msg) {  
         try {
             debug("WebSocket Recv:" + msg.data);
+            world = msg.data;
             //XXX: TODO What are you going to do here?            
         } catch (e) {
             alert("socket on message: " + e);

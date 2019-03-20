@@ -23,6 +23,7 @@ import json
 import os
 
 app = Flask(__name__)
+app._static_folder = os.path.join(os.getcwd(), "static/")
 sockets = Sockets(app)
 app.debug = True
 
@@ -61,15 +62,25 @@ class World:
 
 myWorld = World()        
 
+# Credit to Umut for this: https://stackoverflow.com/a/47526225
+sockets_list = []
+
 def set_listener( entity, data ):
     ''' do something with the update ! '''
+    for socket in sockets_list:
+        if (socket.closed):
+            sockets_list.remove(socket)
+        else:
+            raw_data = {}
+            raw_data[entity] = data
+            socket.send(json.dumps(raw_data))
 
 myWorld.add_set_listener( set_listener )
         
 @app.route('/')
 def hello():
     '''Return something coherent here.. perhaps redirect to /static/index.html '''
-    return None
+    return app.send_static_file("index.html")
 
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
@@ -81,6 +92,19 @@ def subscribe_socket(ws):
     '''Fufill the websocket URL of /subscribe, every update notify the
        websocket and read updates from the websocket '''
     # XXX: TODO IMPLEMENT ME
+    sockets_list.append(ws)
+    while not ws.closed:
+        message = ws.receive()
+        try:
+            if message:
+                message = json.loads(message)
+                keys = message.keys()
+                for key in keys:
+                    myWorld.set(key, message[key])
+        except Exception as e:
+            print(e)
+        #print(message)
+        #ws.send(message)
     return None
 
 
@@ -99,23 +123,30 @@ def flask_post_json():
 @app.route("/entity/<entity>", methods=['POST','PUT'])
 def update(entity):
     '''update the entities via this interface'''
-    return None
+    data = flask_post_json()
+    myWorld.set(entity, data)
+    return Response(json.dumps(data), status=200, mimetype="application/json")
 
 @app.route("/world", methods=['POST','GET'])    
 def world():
     '''you should probably return the world here'''
-    return None
+    return esponse(json.dumps(myWorld.world()), status=200, mimetype="application/json")
 
 @app.route("/entity/<entity>")    
 def get_entity(entity):
     '''This is the GET version of the entity interface, return a representation of the entity'''
-    return None
+    data = myWorld.get(entity)
+    status = 200
+    if (data == None):
+        status = 404
+    return Response(json.dumps(data), status=status, mimetype="application/json")
 
 
 @app.route("/clear", methods=['POST','GET'])
 def clear():
     '''Clear the world out!'''
-    return None
+    myWorld.clear()
+    return Response(json.dumps(myWorld.world()), status=200, mimetype="application/json") 
 
 
 
