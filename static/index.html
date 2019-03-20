@@ -52,10 +52,17 @@ function drawCircle(context,entity) {
         var x = entity["x"];
         var y = entity["y"];
         //moveTo(x,y);
-        fillStyle = entity["colour"];
+        
+        var grad = context.createLinearGradient(0, 0, 150, 150);
+        var colours = getGradient(entity["colour"]);
+        grad.addColorStop(0, colours[0]);
+        grad.addColorStop(1, colours[1]);
+
+        fillStyle = grad;
         strokeStyle = fillStyle;
         arc(x, y, (entity["radius"])?entity["radius"]:50, 0, 2.0 * Math.PI, false);  
-        stroke();                                
+        stroke();
+        fill();               
     }
 }
 
@@ -67,6 +74,18 @@ function prepEntity(entity) {
         entity["radius"] = 50;
     }
     return entity;
+}
+
+function getGradient(colour) {
+    if (colour === "red") {
+        return ["rgba(255, 0, 0, 1)", "rgba(255, 0, 0, 0.5)"];
+    } else if (colour === "green") {
+        return ["rgba(0, 255, 0, 1)", "rgba(0, 255, 0, 0.5)"];
+    } else if (colour === "blue") {
+        return ["rgba(0, 0, 255, 1)", "rgba(0, 0, 255, 0.5)"];
+    }
+    alert("WHAT")
+    return [colour, colour];
 }
 
 function clearFrame() {
@@ -124,7 +143,9 @@ function getPosition(e) {
 function addEntity(entity, data) {
     world[entity] = data;
     drawNextFrame(); // (but should we?)
-    //XXX: Send a XHTML Request that updates the entity you just modified!
+    const toSend = {};
+    toSend[entity] = data;
+    socket.send(JSON.stringify(toSend));
 }
 var counter = 0;
 function addEntityWithoutName(data) {
@@ -254,7 +275,7 @@ function wsSetup() {
     socket = new WebSocket(url);
     socket.onopen = function() {
         //XXX: TODO What are you going to do here?
-        socket.send("START TALKING");
+        //socket.send("fetch all");
     };
     socket.onerror = function(msg) {
         debug("WebSocket Error:" + msg.data);
@@ -262,8 +283,11 @@ function wsSetup() {
     socket.onmessage = function(msg) {  
         try {
             debug("WebSocket Recv:" + msg.data);
-            world = msg.data;
-            //XXX: TODO What are you going to do here?            
+            const json = JSON.parse(msg.data);
+            Object.keys(json).forEach((key) => {
+                world[key] = json[key];
+            });
+            drawNextFrame();
         } catch (e) {
             alert("socket on message: " + e);
         }

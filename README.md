@@ -63,5 +63,17 @@ Contributors
 External References
 ===================
 
-# TODO: attribution details
-https://stackoverflow.com/a/47526225
+Send WebSocket message from Flask view  
+[Question](https://www.stackoverflow.com/questions/47514340/send-websocket-message-from-flask-view)  
+[Answer by umut](https://stackoverflow.com/a/47526225)  
+[umut](https://www.stackoverflow.com/users/1622341/umut), [tiktuk](https://www.stackoverflow.com/users/111510/tiktuk)  
+License: [Creative Commons Attribute-ShareAlike 3.0](https://creativecommons.org/licenses/by-sa/3.0/)  
+
+Flask Sockets code examples  
+https://github.com/heroku-python/flask-sockets  
+[MIT License](https://github.com/heroku-python/flask-sockets/blob/master/LICENSE)  
+
+Code for making the circles look nicer and implementing the server endponts that were also
+in part 4 were taken from my assignment 4 submission:  
+https://github.com/amalik2/CMPUT404-assignment-ajax  
+[Apache License 2.0](https://github.com/amalik2/CMPUT404-assignment-ajax/blob/master/LICENSE)  

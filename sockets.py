@@ -85,14 +85,6 @@ def hello():
 def read_ws(ws,client):
     '''A greenlet function that reads from the websocket and updates the world'''
     # XXX: TODO IMPLEMENT ME
-    return None
-
-@sockets.route('/subscribe')
-def subscribe_socket(ws):
-    '''Fufill the websocket URL of /subscribe, every update notify the
-       websocket and read updates from the websocket '''
-    # XXX: TODO IMPLEMENT ME
-    sockets_list.append(ws)
     while not ws.closed:
         message = ws.receive()
         try:
@@ -102,11 +94,20 @@ def subscribe_socket(ws):
                 for key in keys:
                     myWorld.set(key, message[key])
         except Exception as e:
+            print(message)
             print(e)
         #print(message)
         #ws.send(message)
     return None
 
+@sockets.route('/subscribe')
+def subscribe_socket(ws):
+    '''Fufill the websocket URL of /subscribe, every update notify the
+       websocket and read updates from the websocket '''
+    # XXX: TODO IMPLEMENT ME
+    sockets_list.append(ws)
+    ws.send(json.dumps(myWorld.world()))
+    read_ws(ws, None)
 
 # I give this to you, this is how you get the raw body/data portion of a post in flask
 # this should come with flask but whatever, it's not my project.
@@ -156,4 +157,9 @@ if __name__ == "__main__":
         and run
         gunicorn -k flask_sockets.worker sockets:app
     '''
-    app.run()
+    #app.run()
+    # Credit to https://github.com/heroku-python/flask-sockets (MIT License)
+    from gevent import pywsgi
+    from geventwebsocket.handler import WebSocketHandler
+    server = pywsgi.WSGIServer(('', 5000), app, handler_class=WebSocketHandler)
+    server.serve_forever()
